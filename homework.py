@@ -13,23 +13,30 @@ CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
 def parse_homework_status(homework):
-    homework_name = ...
-    if ...
-        verdict = 'К сожалению в работе нашлись ошибки.'
-    else:
-        verdict = 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
-    return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
+    print(homework)
+#     homework_name = ...
+#     if ...
+#         verdict = 'К сожалению в работе нашлись ошибки.'
+#     else:
+#         verdict = 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
+#     return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
 def get_homework_statuses(current_timestamp):
-    ...
-    homework_statuses = ...
+    current_timestamp = 0
+    headers = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
+    homework_statuses = requests.get(
+        'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
+        headers=headers,
+        params={'from_date': current_timestamp}
+    )
     return homework_statuses.json()
 
 
 def send_message(message):
-    ...
-    return bot.send_message(...)
+    print(message)
+    # ...
+    # return bot.send_message(...)
 
 
 def main():
@@ -38,6 +45,7 @@ def main():
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
+            print(new_homework)
             if new_homework.get('homeworks'):
                 send_message(parse_homework_status(new_homework.get('homeworks')[0]))
             current_timestamp = new_homework.get('current_date')  # обновить timestamp
