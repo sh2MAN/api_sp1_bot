@@ -21,15 +21,17 @@ logging.basicConfig(format=FORMAT_LOG, level=logging.INFO)
 
 
 def parse_homework_status(homework):
-    try:
-        assert homework.get('homework_name') is not None
-        assert homework.get('status') is not None
-        assert homework.get('status') in ('rejected', 'approved')
-    except AssertionError as e:
-        logging.error('Неверный ответ сервера.')
-
     homework_name = homework.get('homework_name')
-    if homework.get('status') != 'approved':
+    homework_status = homework.get('status')
+
+    if (homework_name or homework_status) is None:
+        logging.error('Неверный ответ сервера.')
+        return 'Неверный ответ сервера.'
+    if homework_status not in ('rejected', 'approved'):
+        logging.error('Неверный ответ сервера.')
+        return 'Неверный ответ сервера.'
+
+    if homework_status != 'approved':
         verdict = 'К сожалению в работе нашлись ошибки.'
     else:
         verdict = 'Ревьюеру всё понравилось, можно приступать к следующему уроку.'
@@ -38,7 +40,7 @@ def parse_homework_status(homework):
 
 def get_homework_statuses(current_timestamp):
     if current_timestamp is None:
-        current_timestamp = 0
+        current_timestamp = int(time.time())
 
     headers = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
     try:
@@ -59,7 +61,7 @@ def send_message(message):
 
 
 def main():
-    current_timestamp = int(time.time()) -1000000  # начальное значение timestamp
+    current_timestamp = int(time.time())  # начальное значение timestamp
 
     while True:
         try:
